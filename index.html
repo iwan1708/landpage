@@ -1,6 +1,24 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Landing Page</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+  #visitor { font-weight: bold; font-size: 24px; }
+  #datetime { font-size: 14px; color: #555; margin-top: 5px; display: block; }
+  #error { color: red; font-weight: bold; margin-top: 10px; display: none; }
+</style>
+</head>
+
+<body>
+
+<h2>Selamat Datang di Landing Page</h2>
+
 <div>
-  Visitor: <span id="visitor">0</span><br>
-  Visited at: <span id="datetime">-</span>
+  Visitor: <span id="visitor">0</span>
+  <span id="datetime">-</span>
+  <span id="error">Visitor error</span>
 </div>
 
 <script>
@@ -12,10 +30,12 @@ document.addEventListener("DOMContentLoaded", function () {
     .then(res => res.json())
     .then(data => {
       document.getElementById("visitor").innerText = data.value;
+      document.getElementById("error").style.display = "none"; // sembunyikan error kalau berhasil
     })
     .catch(err => {
       console.error("CountAPI error:", err);
-      document.getElementById("visitor").innerText = "error";
+      document.getElementById("visitor").innerText = "-";
+      document.getElementById("error").style.display = "inline"; // tampilkan error
     });
 
   const now = new Date();
@@ -23,3 +43,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
+
+</body>
+</html>
