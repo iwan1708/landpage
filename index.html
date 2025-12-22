@@ -1,0 +1,25 @@
+<div>
+  Visitor: <span id="visitor">0</span><br>
+  Visited at: <span id="datetime">-</span>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const apiUrl = "https://api.countapi.xyz/hit/iwan1708-landing/visitor";
+
+  fetch(apiUrl)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("visitor").innerText = data.value;
+    })
+    .catch(err => {
+      console.error("CountAPI error:", err);
+      document.getElementById("visitor").innerText = "error";
+    });
+
+  const now = new Date();
+  document.getElementById("datetime").innerText = now.toLocaleString("id-ID");
+
+});
+</script>
