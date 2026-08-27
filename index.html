@@ -213,6 +213,9 @@
     const clearBtn = document.getElementById('clear-all');
     const exportBtn = document.getElementById('export-excel');
 
+    // URL Web App Apps Script Anda
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9E08XYmJ2zVKsfgfkruEUIvdaDusPINkNgUekaTtOz7bNXqoLLme-QHqjiETGqUgW/exec';
+
     // Ambil data dari localStorage atau set array kosong jika belum ada
     let transaksiList = JSON.parse(localStorage.getItem('transaksiKeuangan')) || [];
 
@@ -261,20 +264,48 @@
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
+        const submitBtn = form.querySelector('.btn-submit');
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Menyimpan & Mengirim...';
+
         const tanggal = document.getElementById('tanggal').value;
         const keterangan = document.getElementById('keterangan').value;
         const jenis = document.getElementById('jenis').value;
         const jumlah = document.getElementById('jumlah').value;
 
-        // Tambahkan data baru ke array
+        // 1. Simpan ke Tampilan Lokal (LocalStorage)
         transaksiList.push({ tanggal, keterangan, jenis, jumlah });
-
-        // Update UI dan simpan data
         renderApp();
 
-        // Reset input form
-        document.getElementById('keterangan').value = '';
-        document.getElementById('jumlah').value = '';
+        // 2. Kirim Data ke Google Sheets via Apps Script
+        const payloadData = {
+            tanggal: tanggal,
+            keterangan: keterangan,
+            jenis: jenis,
+            jumlah: jumlah
+        };
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payloadData)
+        })
+        .then(() => {
+            alert('Berhasil! Data tersimpan di web & terkirim ke Google Sheets.');
+            document.getElementById('keterangan').value = '';
+            document.getElementById('jumlah').value = '';
+        })
+        .catch(error => {
+            console.error('Error Google Sheets:', error);
+            alert('Data tersimpan lokal, namun gagal terkirim ke Google Sheets.');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Tambah Transaksi';
+        });
     });
 
     // Fungsi menghapus baris transaksi tertentu
@@ -299,7 +330,6 @@
             return;
         }
 
-        // Format data agar rapi di Excel
         let excelData = [];
         let totalPemasukan = 0;
         let totalPengeluaran = 0;
@@ -320,27 +350,22 @@
             });
         });
 
-        // Tambahkan baris kosong & ringkasan di bawah tabel Excel
         excelData.push({});
         excelData.push({ 'Keterangan': 'TOTAL PEMASUKAN', 'Jumlah (Rp)': totalPemasukan });
         excelData.push({ 'Keterangan': 'TOTAL PENGELUARAN', 'Jumlah (Rp)': totalPengeluaran });
         excelData.push({ 'Keterangan': 'SALDO AKHIR', 'Jumlah (Rp)': totalPemasukan - totalPengeluaran });
 
-        // Buat Worksheet & Workbook SheetJS
         const worksheet = XLSX.utils.json_to_sheet(excelData);
-
-        // Atur lebar kolom otomatis
         worksheet['!cols'] = [
-            { wch: 15 }, // Tanggal
-            { wch: 30 }, // Keterangan
-            { wch: 18 }, // Jenis Transaksi
-            { wch: 18 }  // Jumlah
+            { wch: 15 },
+            { wch: 30 },
+            { wch: 18 },
+            { wch: 18 }
         ];
 
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan Keuangan");
 
-        // Simpan file Excel
         const today = new Date().toISOString().split('T')[0];
         XLSX.writeFile(workbook, `Laporan_Keuangan_${today}.xlsx`);
     });
@@ -351,5 +376,3 @@
 
 </body>
 </html>
-laporan_keuangan.html
-Menampilkan laporan_keuangan.html.
