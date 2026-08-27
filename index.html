@@ -1,42 +1,210 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<title>Landing Page</title>
-<style>
-  body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-  #visitor { font-weight: bold; font-size: 24px; }
-  #datetime { font-size: 14px; color: #555; margin-top: 5px; display: block; }
-  #error { color: red; font-weight: bold; margin-top: 10px; display: none; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Entry Laporan Keuangan Sederhana</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .input-field {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+        input, select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        .btn-submit {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            font-size: 16px;
+        }
+        .btn-submit:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .masuk {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .keluar {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .summary {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+    </style>
 </head>
-
 <body>
 
-<h2>Selamat Datang di Landing Page</h2>
+<div class="container">
+    <h2>Data Entry Laporan Keuangan</h2>
+    
+    <!-- Form Input Data -->
+    <form id="finance-form">
+        <div class="form-group">
+            <div class="input-field">
+                <label for="tanggal">Tanggal</label>
+                <input type="date" id="tanggal" required>
+            </div>
+            <div class="input-field">
+                <label for="keterangan">Keterangan / Deskripsi</label>
+                <input type="text" id="keterangan" placeholder="Contoh: Penjualan Produk A" required>
+            </div>
+            <div class="input-field">
+                <label for="jenis">Jenis Transaksi</label>
+                <select id="jenis" required>
+                    <option value="Pemasukan">Pemasukan (+)</option>
+                    <option value="Pengeluaran">Pengeluaran (-)</option>
+                </select>
+            </div>
+            <div class="input-field">
+                <label for="jumlah">Jumlah (Rp)</label>
+                <input type="number" id="jumlah" placeholder="0" min="1" required>
+            </div>
+        </div>
+        <button type="submit" class="btn-submit">Tambah Transaksi</button>
+    </form>
+
+    <!-- Ringkasan Saldo -->
+    <div class="summary">
+        <div>Total Pemasukan: <span id="total-pemasukan" class="masuk">Rp 0</span></div>
+        <div>Total Pengeluaran: <span id="total-pengeluaran" class="keluar">Rp 0</span></div>
+        <div>Saldo Akhir: <span id="saldo-akhir">Rp 0</span></div>
+    </div>
+
+    <!-- Tabel Data Keuangan -->
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Keterangan</th>
+                <th>Jenis</th>
+                <th>Jumlah</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data akan ditambahkan di sini secara dinamis -->
+        </tbody>
+    </table>
+</div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+    let totalPemasukan = 0;
+    let totalPengeluaran = 0;
 
-  // Gunakan namespace unik baru
-  const apiUrl = "https://api.countapi.xyz/hit/iwan1708-landing-final/visitor";
+    const form = document.getElementById('finance-form');
+    const tableBody = document.querySelector('#data-table tbody');
+    
+    // Set tanggal default ke hari ini
+    document.getElementById('tanggal').valueAsDate = new Date();
 
-  fetch(apiUrl)
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById("visitor").innerText = data.value;
-      document.getElementById("error").style.display = "none"; // sembunyikan error kalau berhasil
-    })
-    .catch(err => {
-      console.error("CountAPI error:", err);
-      document.getElementById("visitor").innerText = "-";
-      document.getElementById("error").style.display = "inline"; // tampilkan error
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Ambil nilai dari form
+        const tanggal = document.getElementById('tanggal').value;
+        const keterangan = document.getElementById('keterangan').value;
+        const jenis = document.getElementById('jenis').value;
+        const jumlah = parseFloat(document.getElementById('jumlah').value);
+
+        // Update Total
+        if (jenis === 'Pemasukan') {
+            totalPemasukan += jumlah;
+        } else {
+            totalPengeluaran += jumlah;
+        }
+        const saldoAkhir = totalPemasukan - totalPengeluaran;
+
+        // Tambah Baris ke Tabel
+        const row = document.createElement('tr');
+        const jenisClass = jenis === 'Pemasukan' ? 'masuk' : 'keluar';
+        
+        row.innerHTML = `
+            <td>${tanggal}</td>
+            <td>${keterangan}</td>
+            <td class="${jenisClass}">${jenis}</td>
+            <td>Rp ${jumlah.toLocaleString('id-ID')}</td>
+        `;
+        tableBody.appendChild(row);
+
+        // Update Tampilan Ringkasan
+        document.getElementById('total-pemasukan').innerText = `Rp ${totalPemasukan.toLocaleString('id-ID')}`;
+        document.getElementById('total-pengeluaran').innerText = `Rp ${totalPengeluaran.toLocaleString('id-ID')}`;
+        document.getElementById('saldo-akhir').innerText = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
+
+        // Reset Input Keterangan dan Jumlah
+        document.getElementById('keterangan').value = '';
+        document.getElementById('jumlah').value = '';
     });
-
-  const now = new Date();
-  document.getElementById("datetime").innerText = now.toLocaleString("id-ID");
-
-});
 </script>
 
 </body>
