@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Entry Laporan Keuangan Sederhana</title>
+    <title>Laporan Keuangan - Maxton Enterprise</title>
     <!-- Library SheetJS untuk Export Excel (.xlsx) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
@@ -24,10 +24,24 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        h2 {
+        .header-brand {
             text-align: center;
-            color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 15px;
+        }
+        .brand-title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #007bff;
+            text-transform: uppercase;
+            margin: 0 0 5px 0;
+        }
+        h2 {
+            margin: 0;
+            color: #1a2530;
+            font-size: 24px;
         }
         .form-group {
             display: grid;
@@ -145,12 +159,22 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+        .footer-brand {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Data Entry Laporan Keuangan</h2>
+    <!-- Branding Header Maxton Enterprise -->
+    <div class="header-brand">
+        <p class="brand-title">MAXTON ENTERPRISE</p>
+        <h2>Data Entry Laporan Keuangan</h2>
+    </div>
     
     <!-- Form Input Data -->
     <form id="finance-form">
@@ -204,6 +228,10 @@
     <div class="action-buttons">
         <button id="export-excel" class="btn-export">📊 Download Excel (.xlsx)</button>
         <button id="clear-all" class="btn-clear">🗑️ Hapus Semua Data</button>
+    </div>
+
+    <div class="footer-brand">
+        &copy; Maxton Enterprise. All rights reserved.
     </div>
 </div>
 
@@ -367,7 +395,7 @@
         XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan Keuangan");
 
         const today = new Date().toISOString().split('T')[0];
-        XLSX.writeFile(workbook, `Laporan_Keuangan_${today}.xlsx`);
+        XLSX.writeFile(workbook, `Laporan_Keuangan_Maxton_${today}.xlsx`);
     });
 
     // Render data pertama kali saat halaman di-load
