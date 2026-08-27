@@ -67,10 +67,31 @@
         .btn-submit:hover {
             background-color: #218838;
         }
+        .btn-clear {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+        .btn-clear:hover {
+            background-color: #c82333;
+        }
+        .btn-delete {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 30px;
+            margin-top: 20px;
         }
         th, td {
             border: 1px solid #ddd;
@@ -100,6 +121,8 @@
             background-color: #e9ecef;
             border-radius: 4px;
             font-weight: bold;
+            flex-wrap: wrap;
+            gap: 10px;
         }
     </style>
 </head>
@@ -149,62 +172,103 @@
                 <th>Keterangan</th>
                 <th>Jenis</th>
                 <th>Jumlah</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Data akan ditambahkan di sini secara dinamis -->
+            <!-- Data dari localStorage akan dirender di sini -->
         </tbody>
     </table>
+
+    <button id="clear-all" class="btn-clear">Hapus Semua Data</button>
 </div>
 
 <script>
-    let totalPemasukan = 0;
-    let totalPengeluaran = 0;
-
     const form = document.getElementById('finance-form');
     const tableBody = document.querySelector('#data-table tbody');
-    
+    const clearBtn = document.getElementById('clear-all');
+
+    // Ambil data dari localStorage atau set array kosong jika belum ada
+    let transaksiList = JSON.parse(localStorage.getItem('transaksiKeuangan')) || [];
+
     // Set tanggal default ke hari ini
     document.getElementById('tanggal').valueAsDate = new Date();
 
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
+    // Fungsi untuk memperbarui tampilan tabel dan statistik ringkasan
+    function renderApp() {
+        tableBody.innerHTML = '';
+        let totalPemasukan = 0;
+        let totalPengeluaran = 0;
 
-        // Ambil nilai dari form
-        const tanggal = document.getElementById('tanggal').value;
-        const keterangan = document.getElementById('keterangan').value;
-        const jenis = document.getElementById('jenis').value;
-        const jumlah = parseFloat(document.getElementById('jumlah').value);
+        transaksiList.forEach((item, index) => {
+            const jumlah = parseFloat(item.jumlah);
+            if (item.jenis === 'Pemasukan') {
+                totalPemasukan += jumlah;
+            } else {
+                totalPengeluaran += jumlah;
+            }
 
-        // Update Total
-        if (jenis === 'Pemasukan') {
-            totalPemasukan += jumlah;
-        } else {
-            totalPengeluaran += jumlah;
-        }
+            const row = document.createElement('tr');
+            const jenisClass = item.jenis === 'Pemasukan' ? 'masuk' : 'keluar';
+
+            row.innerHTML = `
+                <td>${item.tanggal}</td>
+                <td>${item.keterangan}</td>
+                <td class="${jenisClass}">${item.jenis}</td>
+                <td>Rp ${jumlah.toLocaleString('id-ID')}</td>
+                <td><button class="btn-delete" onclick="hapusTransaksi(${index})">Hapus</button></td>
+            `;
+            tableBody.appendChild(row);
+        });
+
         const saldoAkhir = totalPemasukan - totalPengeluaran;
 
-        // Tambah Baris ke Tabel
-        const row = document.createElement('tr');
-        const jenisClass = jenis === 'Pemasukan' ? 'masuk' : 'keluar';
-        
-        row.innerHTML = `
-            <td>${tanggal}</td>
-            <td>${keterangan}</td>
-            <td class="${jenisClass}">${jenis}</td>
-            <td>Rp ${jumlah.toLocaleString('id-ID')}</td>
-        `;
-        tableBody.appendChild(row);
-
-        // Update Tampilan Ringkasan
+        // Update tampilan teks di ringkasan
         document.getElementById('total-pemasukan').innerText = `Rp ${totalPemasukan.toLocaleString('id-ID')}`;
         document.getElementById('total-pengeluaran').innerText = `Rp ${totalPengeluaran.toLocaleString('id-ID')}`;
         document.getElementById('saldo-akhir').innerText = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
 
-        // Reset Input Keterangan dan Jumlah
+        // Simpan array terbaru ke localStorage
+        localStorage.setItem('transaksiKeuangan', JSON.stringify(transaksiList));
+    }
+
+    // Eventlistener saat form di-submit
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const tanggal = document.getElementById('tanggal').value;
+        const keterangan = document.getElementById('keterangan').value;
+        const jenis = document.getElementById('jenis').value;
+        const jumlah = document.getElementById('jumlah').value;
+
+        // Tambahkan data baru ke array
+        transaksiList.push({ tanggal, keterangan, jenis, jumlah });
+
+        // Update UI dan simpan data
+        renderApp();
+
+        // Reset input form
         document.getElementById('keterangan').value = '';
         document.getElementById('jumlah').value = '';
     });
+
+    // Fungsi menghapus baris transaksi tertentu
+    function hapusTransaksi(index) {
+        transaksiList.splice(index, 1);
+        renderApp();
+    }
+
+    // Tombol untuk menghapus seluruh data
+    clearBtn.addEventListener('click', function() {
+        if (confirm('Apakah Anda yakin ingin menghapus seluruh data transaksi?')) {
+            transaksiList = [];
+            localStorage.removeItem('transaksiKeuangan');
+            renderApp();
+        }
+    });
+
+    // Render data pertama kali saat halaman di-load
+    renderApp();
 </script>
 
 </body>
