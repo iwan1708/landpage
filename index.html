@@ -1,406 +1,936 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Keuangan - Maxton Enterprise</title>
-    <!-- Library SheetJS untuk Export Excel (.xlsx) -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <title>Rekam Medis - Program CSR Maxton Enterprise</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .hide-arrows::-webkit-outer-spin-button, .hide-arrows::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .hide-arrows { -moz-appearance: textfield; }
+        #infoModal { transition: opacity 0.3s ease; }
+
+        a[href*="netlify.com"], #netlify-badge, .netlify-badge {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
-        body {
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 20px;
+
+        .input-nilai:focus, .input-nilai:not(:placeholder-shown) {
+            background-color: #2563eb !important; 
+            color: #ffffff !important;
+            border-color: #2563eb !important;
         }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .header-brand {
-            text-align: center;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 15px;
-        }
-        .brand-title {
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: #007bff;
-            text-transform: uppercase;
-            margin: 0 0 5px 0;
-        }
-        h2 {
-            margin: 0;
-            color: #1a2530;
-            font-size: 24px;
-        }
-        .form-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .input-field {
-            display: flex;
-            flex-direction: column;
-        }
-        label {
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: #555;
-        }
-        input, select {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-        .btn-submit {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            font-size: 16px;
-        }
-        .btn-submit:hover {
-            background-color: #218838;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-        .btn-export {
-            background-color: #17a2b8;
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .btn-export:hover {
-            background-color: #138496;
-        }
-        .btn-clear {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .btn-clear:hover {
-            background-color: #c82333;
-        }
-        .btn-delete {
-            background-color: #ff4d4d;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .masuk {
-            color: #28a745;
-            font-weight: bold;
-        }
-        .keluar {
-            color: #dc3545;
-            font-weight: bold;
-        }
-        .summary {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-            font-weight: bold;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .footer-brand {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 12px;
-            color: #888;
-        }
+        .input-nilai::-webkit-input-placeholder { color: #94a3b8; }
+        .input-nilai:focus::-webkit-input-placeholder { color: #bfdbfe; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 pb-20">
 
-<div class="container">
-    <!-- Branding Header Maxton Enterprise -->
-    <div class="header-brand">
-        <p class="brand-title">MAXTON ENTERPRISE</p>
-        <h2>Data Entry Laporan Keuangan</h2>
-    </div>
-    
-    <!-- Form Input Data -->
-    <form id="finance-form">
-        <div class="form-group">
-            <div class="input-field">
-                <label for="tanggal">Tanggal</label>
-                <input type="date" id="tanggal" required>
+    <!-- Sistem Keamanan / Akses Login -->
+    <div id="authScreen" class="fixed inset-0 z-[100] bg-slate-900 flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm text-center border border-slate-200">
+            <div class="flex justify-center mb-4">
+                <img src="logoM.jpg" alt="Logo" class="h-16 w-auto object-contain rounded bg-white" onerror="this.style.display='none'">
             </div>
-            <div class="input-field">
-                <label for="keterangan">Keterangan / Deskripsi</label>
-                <input type="text" id="keterangan" placeholder="Contoh: Penjualan Produk A" required>
+            <h2 class="text-2xl font-bold text-slate-900 mb-1">Akses Sistem</h2>
+            <p class="text-xs font-semibold text-slate-500 mb-8 uppercase tracking-wide">CSR Maxton Enterprise</p>
+            
+            <!-- Layar Inisiasi (Awal) -->
+            <div id="view-init">
+                <!-- Field Input Kode Rahasia (Tersembunyi secara default) -->
+                <div id="secretCodeContainer" class="hidden mb-3">
+                    <input type="password" id="secretCodeInput" placeholder=" unlock-code )" class="w-full text-center rounded-lg border-slate-300 border-2 p-2 focus:ring-2 focus:ring-blue-600 outline-none text-sm font-semibold" autocomplete="off">
+                </div>
+
+                <div class="flex gap-2 mb-3">
+                    <button onclick="generateAppPIN()" class="flex-1 bg-blue-700 hover:bg-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors shadow-sm">Generate PIN</button>
+                    <!-- Tombol Unlock Tersembunyi (Revisi: Warna Merah Tua) -->
+                    <button type="button" onclick="toggleSecretInput()" title="Unlock Kode Rahasia" class="bg-red-800 hover:bg-red-900 text-white p-2.5 rounded-lg border border-red-900 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </button>
+                </div>
+
+                <button onclick="cancelAppPIN()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-4 rounded-lg transition-colors border border-slate-300">Cancel</button>
             </div>
-            <div class="input-field">
-                <label for="jenis">Jenis Transaksi</label>
-                <select id="jenis" required>
-                    <option value="Pemasukan">Pemasukan (+)</option>
-                    <option value="Pengeluaran">Pengeluaran (-)</option>
-                </select>
+
+            <!-- Tampilan Setelah Generate PIN -->
+            <div id="view-pin-result" class="hidden">
+                <p class="text-sm font-semibold text-slate-600 mb-2">Kode PIN Anda (4 Digit):</p>
+                <div class="text-4xl font-bold tracking-[0.25em] text-slate-900 bg-slate-100 py-4 rounded-lg mb-3 border border-slate-200" id="displayPIN"></div>
+                
+                <!-- Notifikasi Wajib Catat / Screenshot -->
+                <div class="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg mb-5 shadow-sm text-center">
+                    <p class="text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 mb-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        WAJIB DICATAT!
+                    </p>
+                    <p class="text-[11px] font-medium leading-relaxed">Silakan <span class="font-bold">Screenshot</span> atau catat kode ini sebelum melanjutkan.</p>
+                </div>
+
+                <button type="button" onclick="showLoginScreen()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors shadow-sm">Lanjut Login</button>
             </div>
-            <div class="input-field">
-                <label for="jumlah">Jumlah (Rp)</label>
-                <input type="number" id="jumlah" placeholder="0" min="1" required>
+
+            <!-- Layar Login -->
+            <div id="view-login" class="hidden">
+                <input type="password" id="inputPIN" placeholder="Masukkan 4 Digit PIN" class="w-full text-center tracking-[0.25em] rounded-lg border-slate-300 border-2 p-3 mb-3 focus:ring-2 focus:ring-blue-600 outline-none font-bold text-lg" maxlength="4">
+                <button type="button" onclick="verifyAppPIN()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors shadow-sm mb-2">Masuk Aplikasi</button>
+                <button type="button" onclick="resetAppPIN()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 px-4 rounded-lg text-xs transition-colors shadow-sm mb-4"> Lupa PIN </button>
             </div>
         </div>
-        <button type="submit" class="btn-submit">Tambah Transaksi</button>
-    </form>
-
-    <!-- Ringkasan Saldo -->
-    <div class="summary">
-        <div>Total Pemasukan: <span id="total-pemasukan" class="masuk">Rp 0</span></div>
-        <div>Total Pengeluaran: <span id="total-pengeluaran" class="keluar">Rp 0</span></div>
-        <div>Saldo Akhir: <span id="saldo-akhir">Rp 0</span></div>
     </div>
 
-    <!-- Tabel Data Keuangan -->
-    <table id="data-table">
-        <thead>
-            <tr>
-                <th>Tanggal</th>
-                <th>Keterangan</th>
-                <th>Jenis</th>
-                <th>Jumlah</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data dari localStorage akan dirender di sini -->
-        </tbody>
-    </table>
-
-    <div class="action-buttons">
-        <button id="export-excel" class="btn-export">📊 Download Excel (.xlsx)</button>
-        <button id="clear-all" class="btn-clear">🗑️ Hapus Semua Data</button>
+    <!-- Modal Konfirmasi Sesi Habis -->
+    <div id="sessionModal" class="hidden fixed inset-0 z-[110] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+         <div class="bg-white p-6 rounded-xl shadow-2xl text-center w-full max-w-xs border border-slate-200">
+              <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mx-auto mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              </div>
+              <h3 class="font-bold text-lg text-slate-900 mb-2">Sesi Habis</h3>
+              <p class="text-xs text-slate-500 mb-6">Sesi 60 menit Anda telah berakhir.</p>
+              <button onclick="extendSession()" class="w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-2.5 px-4 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2">
+                  Anda Mau Lanjut
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+         </div>
     </div>
 
-    <div class="footer-brand">
-        &copy; Maxton Enterprise. All rights reserved.
+    <!-- Konten Utama Aplikasi -->
+    <div id="appMainContent" class="hidden">
+        <header class="bg-slate-900 text-white shadow-lg relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-row justify-between items-center gap-2">
+                <div class="flex items-center gap-3">
+                    <img src="logoM.jpg" alt="Logo" class="h-10 sm:h-12 w-auto object-contain rounded bg-white p-0.5">
+                    <div>
+                        <h1 class="text-lg sm:text-2xl font-bold tracking-tight text-white">Rekam Medis</h1>
+                        <p class="text-slate-400 text-xs sm:text-sm font-medium">Program CSR Maxton Enterprise</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleInfoModal(true)" class="bg-blue-700 hover:bg-blue-600 text-white px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors border border-blue-500 shadow-sm flex items-center gap-1 sm:gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        <span class="hidden sm:inline">Pengantar & Info</span>
+                        <span class="sm:hidden">Info</span>
+                    </button>
+                    <button onclick="forceLogout()" class="bg-red-600 hover:bg-red-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors shadow-sm whitespace-nowrap">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6">
+            <form id="rekamMedisForm" class="space-y-6">
+                <!-- Data Personal Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-100 px-4 py-3 border-b border-slate-200">
+                        <h2 class="text-lg font-bold text-slate-800">Data Personal</h2>
+                    </div>
+                    <div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="lg:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">A. Nama Pasien</label>
+                            <input type="text" id="nama" required class="w-full rounded border-slate-300 border p-2 focus:ring-1 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all text-sm" placeholder="Masukkan nama lengkap">
+                        </div>
+                        <div class="lg:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">B. Tanggal Lahir</label>
+                            <div class="flex gap-2">
+                                <select id="dobDay" required onchange="calculateDetailedAge()" class="w-1/3 rounded border-slate-300 border p-2 text-sm bg-white focus:ring-1 focus:ring-slate-900 outline-none"><option value="">Tgl</option></select>
+                                <select id="dobMonth" required onchange="calculateDetailedAge()" class="w-1/3 rounded border-slate-300 border p-2 text-sm bg-white focus:ring-1 focus:ring-slate-900 outline-none"><option value="">Bln</option></select>
+                                <select id="dobYear" required onchange="calculateDetailedAge()" class="w-1/3 rounded border-slate-300 border p-2 text-sm bg-white focus:ring-1 focus:ring-slate-900 outline-none"><option value="">Thn</option></select>
+                            </div>
+                            <div id="displayUsia" class="text-xs font-semibold text-blue-700 mt-1.5 min-h-[18px]"></div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal Pelaksanaan</label>
+                            <input type="date" id="tglTest" required class="w-full rounded border-slate-300 border p-2 focus:ring-1 focus:ring-slate-900 outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">C. Tinggi Badan (cm)</label>
+                            <input type="number" id="tinggi" required step="0.1" class="hide-arrows w-full rounded border-slate-300 border p-2 focus:ring-1 focus:ring-slate-900 outline-none text-sm" placeholder="165">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">D. Berat Badan (kg)</label>
+                            <input type="number" id="berat" required step="0.1" class="hide-arrows w-full rounded border-slate-300 border p-2 focus:ring-1 focus:ring-slate-900 outline-none text-sm" placeholder="65">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Kalkulasi BMI</label>
+                            <div class="w-full bg-slate-50 rounded border border-slate-200 p-2 flex items-center justify-between">
+                                <span id="bmiValue" class="font-bold text-sm text-slate-800">0.0</span>
+                                <span id="bmiStatus" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-600">Belum dihitung</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hasil Pemeriksaan Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-100 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
+                        <h2 class="text-lg font-bold text-slate-800">Hasil Pemeriksaan Laboratorium</h2>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div id="testRowsContainer" class="space-y-3"></div>
+                        <div id="emptyTestState" class="hidden text-center py-6 text-sm text-slate-500">Belum ada parameter tes. Klik "Tambah Parameter" di bawah.</div>
+                    </div>
+
+                    <div class="bg-slate-50 px-4 py-3 border-t border-slate-200 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                        <button type="button" onclick="addTestRow()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors shadow-sm text-center">
+                            + Tambah Parameter
+                        </button>
+                        <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2 rounded text-sm font-medium transition-colors shadow-sm text-center">
+                            Simpan Rekam Medis
+                        </button>
+                        <button type="button" onclick="toggleGrafikPilihan()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors shadow-sm flex items-center justify-center gap-2">
+                            Laporan Grafik
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div id="grafikCard" class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                    <h3 class="text-lg font-bold text-slate-800">Laporan Grafik Dinamis</h3>
+                    <select id="grafikSelector" onchange="renderDynamicChart()" class="w-full sm:w-64 rounded border-slate-300 border p-2 text-sm focus:ring-1 focus:ring-slate-900 outline-none">
+                        <option value="">-- Pilih Parameter Uji --</option>
+                    </select>
+                </div>
+                <div id="grafikContainer" class="relative w-full h-72 hidden">
+                    <canvas id="dynamicChart"></canvas>
+                </div>
+                <div id="grafikEmpty" class="text-center py-10 text-sm text-slate-500">
+                    Pilih parameter di atas atau tambahkan data terlebih dahulu untuk melihat tren.
+                </div>
+            </div>
+
+            <div class="space-y-4 mt-8">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800">Riwayat Tersimpan</h2>
+                        <p class="text-xs text-slate-500">Daftar pemeriksaan pasien</p>
+                    </div>
+                    <!-- Revisi: Posisi Tombol Upload dan Download ditukar letaknya -->
+                    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                        <input type="file" id="importExcelInput" accept=".xlsx, .xls" onchange="importFromExcel(event)" class="hidden">
+                        <button type="button" onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors shadow-sm flex items-center gap-2 justify-center flex-1 sm:flex-initial">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Download XLS
+                        </button>
+                        <button type="button" onclick="document.getElementById('importExcelInput').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors shadow-sm flex items-center gap-2 justify-center flex-1 sm:flex-initial">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            Upload XLS
+                        </button>
+                    </div>
+                </div>
+                <div id="savedRecordsContainer" class="space-y-4"></div>
+                <div id="emptyRecordsState" class="bg-white rounded-xl border border-slate-200 p-8 text-center text-sm text-slate-500">Belum ada data rekam medis yang tersimpan.</div>
+            </div>
+        </main>
     </div>
-</div>
 
-<script>
-    const form = document.getElementById('finance-form');
-    const tableBody = document.querySelector('#data-table tbody');
-    const clearBtn = document.getElementById('clear-all');
-    const exportBtn = document.getElementById('export-excel');
+    <!-- Modal Pengantar & Info -->
+    <div id="infoModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-4xl h-[85vh] rounded-xl shadow-2xl flex flex-col overflow-hidden border border-slate-200">
+            <div class="bg-slate-900 px-4 py-3 flex justify-between items-center text-white">
+                <h3 class="font-bold text-sm tracking-wide">Pengantar & Info Penggunaan</h3>
+                <button onclick="toggleInfoModal(false)" class="text-slate-300 hover:text-white transition-colors" title="Tutup">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <iframe src="inform.txt" class="flex-1 w-full h-full bg-slate-50 p-4" frameborder="0"></iframe>
+        </div>
+    </div>
 
-    // URL Web App Apps Script Anda
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9E08XYmJ2zVKsfgfkruEUIvdaDusPINkNgUekaTtOz7bNXqoLLme-QHqjiETGqUgW/exec';
+    <script>
+        // --- LOGIKA AUTENTIKASI DAN SESI ---
+        let sessionTimeout, autoLogoutTimeout;
+        const SESSION_DURATION = 60 * 60 * 1000;
+        const AUTO_LOGOUT_GRACE = 60 * 1000;
 
-    // Ambil data dari localStorage atau set array kosong jika belum ada
-    let transaksiList = JSON.parse(localStorage.getItem('transaksiKeuangan')) || [];
+        function checkInitialAuth() {
+            const savedPIN = localStorage.getItem('appSecPIN');
+            if (savedPIN) {
+                document.getElementById('view-init').classList.add('hidden');
+                document.getElementById('view-login').classList.remove('hidden');
+            }
+        }
 
-    // Set tanggal default ke hari ini
-    document.getElementById('tanggal').valueAsDate = new Date();
+        function toggleSecretInput() {
+            const container = document.getElementById('secretCodeContainer');
+            const input = document.getElementById('secretCodeInput');
+            container.classList.toggle('hidden');
+            if (!container.classList.contains('hidden')) {
+                input.focus();
+            }
+        }
 
-    // Fungsi untuk memperbarui tampilan tabel dan statistik ringkasan
-    function renderApp() {
-        tableBody.innerHTML = '';
-        let totalPemasukan = 0;
-        let totalPengeluaran = 0;
-
-        transaksiList.forEach((item, index) => {
-            const jumlah = parseFloat(item.jumlah);
-            if (item.jenis === 'Pemasukan') {
-                totalPemasukan += jumlah;
-            } else {
-                totalPengeluaran += jumlah;
+        function generateAppPIN() {
+            const secretInput = document.getElementById('secretCodeInput').value;
+            
+            if (secretInput !== 'pin17') {
+                alert("Kode rahasia salah atau belum diisi! Klik tombol gembok di sebelah tombol Generate PIN lalu ketik kode rahasianya.");
+                return;
             }
 
-            const row = document.createElement('tr');
-            const jenisClass = item.jenis === 'Pemasukan' ? 'masuk' : 'keluar';
+            const random2 = Math.floor(10 + Math.random() * 90).toString();
+            const now = new Date();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            
+            const finalPIN = random2 + mm;
+            localStorage.setItem('appSecPIN', finalPIN);
+            
+            document.getElementById('view-init').classList.add('hidden');
+            document.getElementById('view-pin-result').classList.remove('hidden');
+            document.getElementById('displayPIN').innerText = finalPIN;
+        }
 
-            row.innerHTML = `
-                <td>${item.tanggal}</td>
-                <td>${item.keterangan}</td>
-                <td class="${jenisClass}">${item.jenis}</td>
-                <td>Rp ${jumlah.toLocaleString('id-ID')}</td>
-                <td><button class="btn-delete" onclick="hapusTransaksi(${index})">Hapus</button></td>
-            `;
-            tableBody.appendChild(row);
-        });
+        function cancelAppPIN() {
+            alert("Proses dibatalkan.");
+        }
 
-        const saldoAkhir = totalPemasukan - totalPengeluaran;
+        function resetAppPIN() {
+            localStorage.removeItem('appSecPIN');
+            document.getElementById('secretCodeInput').value = '';
+            document.getElementById('secretCodeContainer').classList.add('hidden');
+            document.getElementById('view-login').classList.add('hidden');
+            document.getElementById('view-pin-result').classList.add('hidden');
+            document.getElementById('view-init').classList.remove('hidden');
+        }
 
-        // Update tampilan teks di ringkasan
-        document.getElementById('total-pemasukan').innerText = `Rp ${totalPemasukan.toLocaleString('id-ID')}`;
-        document.getElementById('total-pengeluaran').innerText = `Rp ${totalPengeluaran.toLocaleString('id-ID')}`;
-        document.getElementById('saldo-akhir').innerText = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
+        function showLoginScreen() {
+            document.getElementById('view-pin-result').classList.add('hidden');
+            document.getElementById('view-login').classList.remove('hidden');
+        }
 
-        // Simpan array terbaru ke localStorage
-        localStorage.setItem('transaksiKeuangan', JSON.stringify(transaksiList));
-    }
+        function verifyAppPIN() {
+            const inputVal = document.getElementById('inputPIN').value;
+            const savedPIN = localStorage.getItem('appSecPIN');
+            
+            if (inputVal === savedPIN && inputVal !== '') {
+                document.getElementById('authScreen').classList.add('hidden');
+                document.getElementById('appMainContent').classList.remove('hidden');
+                document.getElementById('inputPIN').value = '';
+                startSessionTimer();
+            } else {
+                alert("PIN Tidak Valid! Masukkan ulang PIN Anda.");
+            }
+        }
 
-    // Eventlistener saat form di-submit
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
+        function startSessionTimer() {
+            clearTimeout(sessionTimeout);
+            clearTimeout(autoLogoutTimeout);
+            
+            sessionTimeout = setTimeout(() => {
+                document.getElementById('sessionModal').classList.remove('hidden');
+                
+                autoLogoutTimeout = setTimeout(() => {
+                    forceLogout();
+                }, AUTO_LOGOUT_GRACE);
+                
+            }, SESSION_DURATION);
+        }
 
-        const submitBtn = form.querySelector('.btn-submit');
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'Menyimpan & Mengirim...';
+        function extendSession() {
+            document.getElementById('sessionModal').classList.add('hidden');
+            startSessionTimer();
+        }
 
-        const tanggal = document.getElementById('tanggal').value;
-        const keterangan = document.getElementById('keterangan').value;
-        const jenis = document.getElementById('jenis').value;
-        const jumlah = document.getElementById('jumlah').value;
+        function forceLogout() {
+            document.getElementById('sessionModal').classList.add('hidden');
+            document.getElementById('appMainContent').classList.add('hidden');
+            document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('inputPIN').value = '';
+            
+            clearTimeout(sessionTimeout);
+            clearTimeout(autoLogoutTimeout);
+        }
 
-        // 1. Simpan ke Tampilan Lokal (LocalStorage)
-        transaksiList.push({ tanggal, keterangan, jenis, jumlah });
-        renderApp();
+        checkInitialAuth();
 
-        // 2. Kirim Data ke Google Sheets via Apps Script
-        const payloadData = {
-            tanggal: tanggal,
-            keterangan: keterangan,
-            jenis: jenis,
-            jumlah: jumlah
+        // --- LOGIKA UTAMA APLIKASI ---
+        const testParameters = [
+            { id: "sistol", name: "01. Tekanan Darah Sistol", unit: "mmHg", type: "number", normalText: "< 120", eval: v => v < 120 ? 'Normal' : (v < 140 ? 'Warning' : 'Risk') },
+            { id: "diastol", name: "02. Tekanan Darah Diastol", unit: "mmHg", type: "number", normalText: "< 80", eval: v => v < 80 ? 'Normal' : (v < 90 ? 'Warning' : 'Risk') },
+            { id: "gds", name: "03. Gula Darah Sewaktu (GDS)", unit: "mg/dL", type: "number", normalText: "< 140", eval: v => v < 140 ? 'Normal' : (v < 200 ? 'Warning' : 'Risk') },
+            { id: "gdp", name: "04. Gula Darah Puasa (GDP)", unit: "mg/dL", type: "number", normalText: "< 100", eval: v => v < 100 ? 'Normal' : (v < 126 ? 'Warning' : 'Risk') },
+            { id: "hba1c", name: "05. HbA1c", unit: "%", type: "number", normalText: "< 5.7", eval: v => v < 5.7 ? 'Normal' : (v < 6.5 ? 'Warning' : 'Risk') },
+            { id: "kolesterol", name: "06. Kolesterol Total", unit: "mg/dL", type: "number", normalText: "< 200", eval: v => v < 200 ? 'Normal' : (v < 240 ? 'Warning' : 'Risk') },
+            { id: "trigliserida", name: "07. Trigliserida", unit: "mg/dL", type: "number", normalText: "< 150", eval: v => v < 150 ? 'Normal' : (v < 200 ? 'Warning' : 'Risk') },
+            { id: "hdl", name: "08. HDL (Kolesterol Baik)", unit: "mg/dL", type: "number", normalText: ">= 60", eval: v => v >= 60 ? 'Normal' : (v >= 40 ? 'Warning' : 'Risk') },
+            { id: "ldl", name: "09. LDL (Kolesterol Jahat)", unit: "mg/dL", type: "number", normalText: "< 100", eval: v => v < 100 ? 'Normal' : (v < 160 ? 'Warning' : 'Risk') },
+            { id: "asamurat", name: "10. Asam Urat", unit: "mg/dL", type: "number", normalText: "< 7.0", eval: v => v <= 7.0 ? 'Normal' : (v <= 8.0 ? 'Warning' : 'Risk') },
+            { id: "ureum", name: "11. Ureum", unit: "mg/dL", type: "number", normalText: "15 - 40", eval: v => (v >= 15 && v <= 40) ? 'Normal' : ((v > 40 && v <= 50) ? 'Warning' : 'Risk') },
+            { id: "creatinine", name: "12. Creatinine", unit: "mg/dL", type: "number", normalText: "0.6 - 1.2", eval: v => (v >= 0.6 && v <= 1.2) ? 'Normal' : ((v > 1.2 && v <= 1.5) ? 'Warning' : 'Risk') },
+            { id: "sgot", name: "13. SGOT / AST", unit: "U/L", type: "number", normalText: "< 40", eval: v => v <= 40 ? 'Normal' : (v <= 80 ? 'Warning' : 'Risk') },
+            { id: "sgpt", name: "14. SGPT / ALT", unit: "U/L", type: "number", normalText: "< 40", eval: v => v <= 40 ? 'Normal' : (v <= 80 ? 'Warning' : 'Risk') },
+            { id: "albumin", name: "15. Albumin", unit: "g/dL", type: "number", normalText: "3.5 - 5.0", eval: v => (v >= 3.5 && v <= 5.0) ? 'Normal' : ((v >= 3.0 && v < 3.5) ? 'Warning' : 'Risk') },
+            { id: "dokter", name: "16. Kontrol Dokter", unit: "", type: "text", normalText: "-", eval: v => 'Dicatat' }
+        ];
+        
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        let activeTests = [];
+        let savedRecords = []; 
+        let dynChartInstance = null;
+
+        const elements = {
+            nama: document.getElementById('nama'),
+            dobDay: document.getElementById('dobDay'),
+            dobMonth: document.getElementById('dobMonth'),
+            dobYear: document.getElementById('dobYear'),
+            displayUsia: document.getElementById('displayUsia'),
+            tglTest: document.getElementById('tglTest'),
+            tinggi: document.getElementById('tinggi'),
+            berat: document.getElementById('berat'),
+            bmiValue: document.getElementById('bmiValue'),
+            bmiStatus: document.getElementById('bmiStatus'),
+            rowsContainer: document.getElementById('testRowsContainer')
         };
 
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payloadData)
-        })
-        .then(() => {
-            alert('Berhasil! Data tersimpan di web & terkirim ke Google Sheets.');
-            document.getElementById('keterangan').value = '';
-            document.getElementById('jumlah').value = '';
-        })
-        .catch(error => {
-            console.error('Error Google Sheets:', error);
-            alert('Data tersimpan lokal, namun gagal terkirim ke Google Sheets.');
-        })
-        .finally(() => {
-            submitBtn.disabled = false;
-            submitBtn.innerText = 'Tambah Transaksi';
-        });
-    });
-
-    // Fungsi menghapus baris transaksi tertentu
-    function hapusTransaksi(index) {
-        transaksiList.splice(index, 1);
-        renderApp();
-    }
-
-    // Tombol untuk menghapus seluruh data
-    clearBtn.addEventListener('click', function() {
-        if (confirm('Apakah Anda yakin ingin menghapus seluruh data transaksi?')) {
-            transaksiList = [];
-            localStorage.removeItem('transaksiKeuangan');
-            renderApp();
-        }
-    });
-
-    // Fungsi untuk Export Data ke Excel (.xlsx)
-    exportBtn.addEventListener('click', function() {
-        if (transaksiList.length === 0) {
-            alert('Belum ada data transaksi untuk di-download!');
-            return;
+        function toggleInfoModal(show) {
+            const modal = document.getElementById('infoModal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
         }
 
-        let excelData = [];
-        let totalPemasukan = 0;
-        let totalPengeluaran = 0;
+        function populateDobDropdowns() {
+            for (let i = 1; i <= 31; i++) {
+                elements.dobDay.insertAdjacentHTML('beforeend', `<option value="${i < 10 ? '0'+i : i}">${i}</option>`);
+            }
+            monthNames.forEach((month, idx) => {
+                elements.dobMonth.insertAdjacentHTML('beforeend', `<option value="${(idx+1) < 10 ? '0'+(idx+1) : (idx+1)}">${month}</option>`);
+            });
+            const currentYear = new Date().getFullYear();
+            for (let y = currentYear; y >= currentYear - 100; y--) {
+                elements.dobYear.insertAdjacentHTML('beforeend', `<option value="${y}">${y}</option>`);
+            }
+            
+            const gSelector = document.getElementById('grafikSelector');
+            testParameters.forEach(t => {
+                if(t.type !== 'text') gSelector.insertAdjacentHTML('beforeend', `<option value="${t.id}">${t.name}</option>`);
+            });
+        }
 
-        transaksiList.forEach(item => {
-            const nominal = parseFloat(item.jumlah);
-            if (item.jenis === 'Pemasukan') {
-                totalPemasukan += nominal;
-            } else {
-                totalPengeluaran += nominal;
+        function init() {
+            populateDobDropdowns();
+            elements.tglTest.value = new Date().toISOString().split('T')[0];
+
+            const lastData = JSON.parse(localStorage.getItem('lastPatientData'));
+            if (lastData) {
+                elements.nama.value = lastData.nama || '';
+                if (lastData.tglLahir) {
+                    const parts = lastData.tglLahir.split('-');
+                    if (parts.length === 3) {
+                        elements.dobYear.value = parts[0];
+                        elements.dobMonth.value = parts[1];
+                        elements.dobDay.value = parts[2];
+                        calculateDetailedAge();
+                    }
+                }
+                elements.tinggi.value = lastData.tinggi || '';
+                elements.berat.value = lastData.berat || '';
+                if(lastData.tinggi && lastData.berat) calculateBMI();
             }
 
-            excelData.push({
-                'Tanggal': item.tanggal,
-                'Keterangan': item.keterangan,
-                'Jenis Transaksi': item.jenis,
-                'Jumlah (Rp)': nominal
+            elements.tinggi.addEventListener('input', calculateBMI);
+            elements.berat.addEventListener('input', calculateBMI);
+            addTestRow();
+            
+            const localRecords = JSON.parse(localStorage.getItem('csrRecords'));
+            if(localRecords) {
+                savedRecords = localRecords;
+                renderSavedRecords();
+            }
+        }
+
+        function getDobISOString() {
+            if (elements.dobDay.value && elements.dobMonth.value && elements.dobYear.value) {
+                return `${elements.dobYear.value}-${elements.dobMonth.value}-${elements.dobDay.value}`;
+            }
+            return '';
+        }
+
+        function calculateDetailedAge() {
+            const dobIso = getDobISOString();
+            if (!dobIso) {
+                if(elements.displayUsia) elements.displayUsia.textContent = '';
+                return null;
+            }
+            const birthDate = new Date(dobIso);
+            const today = new Date();
+            let years = today.getFullYear() - birthDate.getFullYear();
+            let months = today.getMonth() - birthDate.getMonth();
+            let days = today.getDate() - birthDate.getDate();
+
+            if (days < 0) {
+                months--;
+                const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                days += prevMonth.getDate();
+            }
+            if (months < 0) { years--; months += 12; }
+            
+            const formatted = `${years} Tahun, ${months} Bulan, ${days} Hari`;
+            if(elements.displayUsia) elements.displayUsia.textContent = `Usia: ${formatted}`;
+            
+            return { formatted, dobIso };
+        }
+
+        function calculateBMI() {
+            const h = parseFloat(elements.tinggi.value);
+            const w = parseFloat(elements.berat.value);
+            if (h > 0 && w > 0) {
+                const bmi = (w / ((h/100) * (h/100))).toFixed(1);
+                elements.bmiValue.textContent = bmi;
+                let status = '', bgClass = '', textClass = '';
+                if (bmi < 18.5) { status = 'Underweight'; bgClass = 'bg-yellow-100'; textClass = 'text-yellow-800'; } 
+                else if (bmi <= 24.9) { status = 'Normal'; bgClass = 'bg-emerald-100'; textClass = 'text-emerald-800'; } 
+                else if (bmi <= 29.9) { status = 'Overweight'; bgClass = 'bg-yellow-100'; textClass = 'text-yellow-800'; } 
+                else { status = 'Obese'; bgClass = 'bg-red-100'; textClass = 'text-red-800'; }
+                
+                elements.bmiStatus.textContent = status;
+                elements.bmiStatus.className = `px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${bgClass} ${textClass}`;
+                return { bmi, status };
+            }
+            elements.bmiValue.textContent = '0.0';
+            elements.bmiStatus.textContent = 'Belum dihitung';
+            elements.bmiStatus.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-600';
+            return null;
+        }
+
+        function generateTestOptions(selectedId = '') {
+            let options = `<option value="" disabled ${!selectedId ? 'selected' : ''}>-- Pilih Parameter --</option>`;
+            testParameters.forEach(test => {
+                options += `<option value="${test.id}" ${selectedId === test.id ? 'selected' : ''}>${test.name}</option>`;
             });
+            return options;
+        }
+
+        function getFlagClass(status) {
+            if(status === 'Normal') return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+            if(status === 'Warning') return 'bg-amber-100 text-amber-800 border-amber-300';
+            if(status === 'Risk') return 'bg-rose-100 text-rose-800 border-rose-300';
+            if(status === 'Dicatat') return 'bg-blue-100 text-blue-800 border-blue-300';
+            return 'bg-slate-100 text-slate-400 border-slate-200';
+        }
+
+        function addTestRow() {
+            const rowId = 'row_' + Date.now() + Math.random().toString(36).substr(2, 5);
+            const testObj = { rowId, testId: '', value: '', status: '' };
+            activeTests.push(testObj);
+            renderSingleRow(testObj);
+            document.getElementById('emptyTestState').classList.add('hidden');
+        }
+
+        function removeTestRow(rowId) {
+            activeTests = activeTests.filter(t => t.rowId !== rowId);
+            const el = document.getElementById(rowId);
+            if(el) el.remove();
+            document.getElementById('emptyTestState').classList.toggle('hidden', activeTests.length > 0);
+        }
+
+        function handleTestChange(rowId, selectElement) {
+            const testId = selectElement.value;
+            const testObj = activeTests.find(t => t.rowId === rowId);
+            if(testObj) {
+                testObj.testId = testId;
+                const paramDef = testParameters.find(p => p.id === testId);
+                const inputEl = document.getElementById(`input_${rowId}`);
+                
+                if(paramDef && paramDef.type === 'text') {
+                    inputEl.type = 'text';
+                    inputEl.placeholder = "Nama Dokter & Penyakit";
+                } else {
+                    inputEl.type = 'number';
+                    inputEl.placeholder = "Masukkan Nilai";
+                }
+                
+                document.getElementById(`normal_${rowId}`).textContent = paramDef ? `Normal: ${paramDef.normalText} ${paramDef.unit}` : 'Normal: -';
+                testObj.value = '';
+                inputEl.value = '';
+                evaluateRowDirectly(rowId);
+            }
+        }
+
+        function handleValueChange(rowId, inputElement) {
+            const testObj = activeTests.find(t => t.rowId === rowId);
+            if(testObj) {
+                testObj.value = inputElement.value;
+                evaluateRowDirectly(rowId);
+            }
+        }
+
+        function evaluateRowDirectly(rowId) {
+            const testObj = activeTests.find(t => t.rowId === rowId);
+            const statusEl = document.getElementById(`status_${rowId}`);
+            if(!testObj || !statusEl) return;
+
+            if(!testObj.testId || testObj.value === '') {
+                testObj.status = '';
+                statusEl.textContent = 'Menunggu';
+                statusEl.className = `px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getFlagClass('')}`;
+                return;
+            }
+
+            const paramDef = testParameters.find(p => p.id === testObj.testId);
+            if(paramDef) {
+                if(paramDef.type === 'text') {
+                    testObj.status = paramDef.eval(testObj.value);
+                } else {
+                    const numValue = parseFloat(testObj.value);
+                    testObj.status = paramDef.eval(numValue);
+                }
+                statusEl.textContent = testObj.status;
+                statusEl.className = `px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getFlagClass(testObj.status)}`;
+            }
+        }
+
+        function renderSingleRow(testObj) {
+            const div = document.createElement('div');
+            div.id = testObj.rowId;
+            div.className = "flex flex-col md:flex-row gap-3 items-start md:items-center p-3 bg-slate-50 border border-slate-200 rounded-lg";
+            
+            div.innerHTML = `
+                <div class="w-full md:flex-1">
+                    <select onchange="handleTestChange('${testObj.rowId}', this)" required class="w-full rounded border-slate-300 border p-2 bg-white focus:ring-1 focus:ring-slate-900 outline-none text-sm">
+                        ${generateTestOptions(testObj.testId)}
+                    </select>
+                </div>
+                <div class="w-full md:w-56">
+                    <input id="input_${testObj.rowId}" type="number" step="0.01" oninput="handleValueChange('${testObj.rowId}', this)" value="${testObj.value}" required class="input-nilai w-full rounded border-slate-300 border p-2 bg-white outline-none text-sm hide-arrows transition-colors" placeholder="Masukkan Nilai">
+                </div>
+                <div class="flex items-center justify-between md:w-56 w-full">
+                    <div>
+                        <span id="normal_${testObj.rowId}" class="text-[11px] text-slate-500 font-mono block">Normal: -</span>
+                        <span id="status_${testObj.rowId}" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getFlagClass(testObj.status)} mt-1 inline-block">Menunggu</span>
+                    </div>
+                    <button type="button" onclick="removeTestRow('${testObj.rowId}')" class="text-slate-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </div>
+            `;
+            elements.rowsContainer.appendChild(div);
+        }
+
+        document.getElementById('rekamMedisForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if(activeTests.length === 0) { alert("Tambah minimal satu parameter tes."); return; }
+            if(activeTests.some(t => !t.testId || t.value === '')) { alert("Isi parameter dan nilainya secara lengkap."); return; }
+
+            const ageObj = calculateDetailedAge();
+            const bmiData = calculateBMI();
+            const dobIso = getDobISOString();
+
+            if(!dobIso) { alert("Lengkapi Tanggal Lahir pasien."); return; }
+
+            localStorage.setItem('lastPatientData', JSON.stringify({ nama: elements.nama.value, tglLahir: dobIso, tinggi: elements.tinggi.value, berat: elements.berat.value }));
+
+            const record = {
+                id: Date.now(), tglTest: elements.tglTest.value, nama: elements.nama.value, tglLahir: dobIso,
+                usiaDetail: ageObj ? ageObj.formatted : '-', tinggi: elements.tinggi.value, berat: elements.berat.value,
+                bmi: bmiData ? bmiData.bmi : '-', bmiStatus: bmiData ? bmiData.status : '-',
+                tests: activeTests.map(t => {
+                    const paramDef = testParameters.find(p => p.id === t.testId);
+                    return { id: t.testId, name: paramDef.name, unit: paramDef.unit, type: paramDef.type, normalText: paramDef.normalText, value: t.value, status: t.status };
+                })
+            };
+
+            savedRecords.push(record);
+            localStorage.setItem('csrRecords', JSON.stringify(savedRecords));
+            
+            elements.rowsContainer.innerHTML = '';
+            activeTests = [];
+            addTestRow();
+            renderSavedRecords();
+            renderDynamicChart();
+            alert("Data berhasil disimpan!");
         });
 
-        excelData.push({});
-        excelData.push({ 'Keterangan': 'TOTAL PEMASUKAN', 'Jumlah (Rp)': totalPemasukan });
-        excelData.push({ 'Keterangan': 'TOTAL PENGELUARAN', 'Jumlah (Rp)': totalPengeluaran });
-        excelData.push({ 'Keterangan': 'SALDO AKHIR', 'Jumlah (Rp)': totalPemasukan - totalPengeluaran });
+        function deleteRecord(id) {
+            if(confirm("Hapus catatan rekam medis ini?")) {
+                savedRecords = savedRecords.filter(r => r.id !== id);
+                localStorage.setItem('csrRecords', JSON.stringify(savedRecords));
+                renderSavedRecords();
+                renderDynamicChart();
+            }
+        }
 
-        const worksheet = XLSX.utils.json_to_sheet(excelData);
-        worksheet['!cols'] = [
-            { wch: 15 },
-            { wch: 30 },
-            { wch: 18 },
-            { wch: 18 }
-        ];
+        function toggleGrafikPilihan() {
+            const card = document.getElementById('grafikCard');
+            card.classList.toggle('hidden');
+        }
 
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan Keuangan");
+        function renderDynamicChart() {
+            const paramId = document.getElementById('grafikSelector').value;
+            const container = document.getElementById('grafikContainer');
+            const emptyState = document.getElementById('grafikEmpty');
+            
+            if (!paramId) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
 
-        const today = new Date().toISOString().split('T')[0];
-        XLSX.writeFile(workbook, `Laporan_Keuangan_Maxton_${today}.xlsx`);
-    });
+            const paramDef = testParameters.find(p => p.id === paramId);
+            let dataPoints = [];
 
-    // Render data pertama kali saat halaman di-load
-    renderApp();
-</script>
+            savedRecords.forEach(rec => {
+                const test = rec.tests.find(t => t.id === paramId);
+                if (test && !isNaN(parseFloat(test.value))) {
+                    dataPoints.push({ date: rec.tglTest, value: parseFloat(test.value), name: rec.nama });
+                }
+            });
 
+            dataPoints.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            if (dataPoints.length === 0) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                emptyState.textContent = `Belum ada data numerik tersimpan untuk parameter ${paramDef.name}.`;
+                return;
+            }
+
+            container.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            const labels = dataPoints.map(d => `${d.date} (${d.name})`);
+            const dataValues = dataPoints.map(d => d.value);
+
+            const ctx = document.getElementById('dynamicChart').getContext('2d');
+            if (dynChartInstance) dynChartInstance.destroy();
+
+            dynChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `${paramDef.name} (${paramDef.unit})`,
+                        data: dataValues,
+                        borderColor: '#0f172a', 
+                        backgroundColor: 'rgba(15, 23, 42, 0.05)',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#4f46e5',
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: true, position: 'top' } }
+                }
+            });
+        }
+
+        function renderSavedRecords() {
+            const container = document.getElementById('savedRecordsContainer');
+            document.getElementById('emptyRecordsState').classList.toggle('hidden', savedRecords.length > 0);
+            container.innerHTML = '';
+            
+            [...savedRecords].sort((a,b) => b.id - a.id).forEach(rec => {
+                let testsHtml = '';
+                rec.tests.forEach(t => {
+                    testsHtml += `
+                        <div class="bg-slate-50 border border-slate-200 rounded p-2 flex flex-col justify-between">
+                            <span class="text-[10px] text-slate-500 font-bold block truncate">${t.name}</span>
+                            <div class="mt-1">
+                                <span class="text-sm font-bold text-slate-900">${t.value}</span>
+                                <span class="text-[10px] text-slate-500">${t.unit}</span>
+                            </div>
+                            <div class="mt-2 flex justify-between items-center">
+                                <span class="text-[9px] text-slate-400">Normal: ${t.normalText}</span>
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${getFlagClass(t.status)}">${t.status}</span>
+                            </div>
+                        </div>`;
+                });
+
+                container.insertAdjacentHTML('beforeend', `
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
+                            <div>
+                                <span class="text-[10px] font-bold text-slate-900 bg-slate-200 px-2 py-0.5 rounded uppercase tracking-wide">Tgl: ${rec.tglTest}</span>
+                                <h3 class="text-base font-bold text-slate-900 mt-1">${rec.nama}</h3>
+                            </div>
+                            <button onclick="deleteRecord(${rec.id})" class="text-slate-400 hover:text-red-600 transition-colors p-1" title="Hapus">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                        <div class="p-4 space-y-4">
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pb-3 border-b border-slate-100">
+                                <div><span class="text-[10px] text-slate-400 block uppercase">Usia</span><span class="text-xs font-semibold text-slate-700">${rec.usiaDetail}</span></div>
+                                <div><span class="text-[10px] text-slate-400 block uppercase">Fisik</span><span class="text-xs font-semibold text-slate-700">${rec.tinggi}cm / ${rec.berat}kg</span></div>
+                                <div><span class="text-[10px] text-slate-400 block uppercase">BMI</span><span class="text-xs font-semibold text-slate-700">${rec.bmi}</span></div>
+                                <div><span class="text-[10px] text-slate-400 block uppercase">Kategori BMI</span><span class="text-xs font-semibold text-slate-700">${rec.bmiStatus}</span></div>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                                ${testsHtml}
+                            </div>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        function exportToExcel() {
+            if(savedRecords.length === 0) return alert("Belum ada data rekam medis.");
+            
+            let dataRows = [];
+            let headers = ["Tanggal Test", "Nama Pasien", "Tanggal Lahir", "Usia Detail", "Tinggi (cm)", "Berat (kg)", "BMI", "Kategori BMI", "Parameter Uji", "Hasil", "Satuan", "Normal", "Status Evaluasi"];
+            dataRows.push(headers);
+
+            savedRecords.forEach(rec => {
+                rec.tests.forEach(t => {
+                    dataRows.push([
+                        rec.tglTest, rec.nama, rec.tglLahir, rec.usiaDetail, rec.tinggi, rec.berat,
+                        rec.bmi, rec.bmiStatus, t.name, t.value, t.unit, t.normalText, t.status
+                    ]);
+                });
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(dataRows);
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            
+            for (let R = 0; R <= range.e.r; ++R) {
+                for (let C = 0; C <= range.e.c; ++C) {
+                    let cellAddress = {c: C, r: R};
+                    let cellRef = XLSX.utils.encode_cell(cellAddress);
+                    let cell = ws[cellRef];
+                    
+                    if (!cell) continue;
+                    if (!cell.s) cell.s = {};
+                    
+                    cell.s.border = {
+                        top: {style: "thin", color: {auto: 1}},
+                        bottom: {style: "thin", color: {auto: 1}},
+                        left: {style: "thin", color: {auto: 1}},
+                        right: {style: "thin", color: {auto: 1}}
+                    };
+                    cell.s.alignment = { vertical: "center" };
+                    
+                    if (R === 0) {
+                        cell.s.font = { bold: true, color: { rgb: "FFFFFF" } };
+                        cell.s.fill = { fgColor: { rgb: "0F172A" } };
+                    } 
+                    else if (C === 12) {
+                        let statusVal = cell.v;
+                        let fillColor = "FFFFFF"; 
+                        
+                        if (statusVal === "Normal") fillColor = "C6F6D5"; 
+                        else if (statusVal === "Warning") fillColor = "FEFCBF"; 
+                        else if (statusVal === "Risk") fillColor = "FED7D7"; 
+                        else if (statusVal === "Dicatat") fillColor = "BEE3F8"; 
+                        
+                        cell.s.fill = { fgColor: { rgb: fillColor } };
+                        cell.s.font = { bold: true };
+                    }
+                }
+            }
+
+            ws['!cols'] = [
+                {wch: 12}, {wch: 25}, {wch: 12}, {wch: 22}, {wch: 10}, {wch: 10}, 
+                {wch: 8}, {wch: 15}, {wch: 28}, {wch: 10}, {wch: 10}, {wch: 15}, {wch: 18}
+            ];
+
+            let counter = parseInt(localStorage.getItem('exportCounterRM') || '1');
+            let numFormatted = String(counter).padStart(2, '0');
+            let fileName = `RM${numFormatted}.xlsx`;
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Rekam Medis");
+            XLSX.writeFile(wb, fileName);
+
+            localStorage.setItem('exportCounterRM', counter + 1);
+        }
+
+        function importFromExcel(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (!jsonData || jsonData.length === 0) {
+                        alert("File Excel kosong atau format tidak sesuai.");
+                        return;
+                    }
+
+                    const recordsMap = {};
+
+                    jsonData.forEach((row, index) => {
+                        const tglTest = row["Tanggal Test"] || row["tglTest"] || "";
+                        const nama = row["Nama Pasien"] || row["nama"] || "";
+                        const tglLahir = row["Tanggal Lahir"] || row["tglLahir"] || "";
+                        const usiaDetail = row["Usia Detail"] || row["usiaDetail"] || "-";
+                        const tinggi = row["Tinggi (cm)"] || row["tinggi"] || "";
+                        const berat = row["Berat (kg)"] || row["berat"] || "";
+                        const bmi = row["BMI"] || row["bmi"] || "-";
+                        const bmiStatus = row["Kategori BMI"] || row["bmiStatus"] || "-";
+                        
+                        const paramName = row["Parameter Uji"] || "";
+                        const paramVal = row["Hasil"] !== undefined ? String(row["Hasil"]) : "";
+                        const paramUnit = row["Satuan"] || "";
+                        const paramNormal = row["Normal"] || "";
+                        const paramStatus = row["Status Evaluasi"] || "";
+
+                        const paramDef = testParameters.find(p => p.name === paramName) || {};
+                        const paramId = paramDef.id || ("param_" + index);
+
+                        const key = `${tglTest}_${nama}_${tglLahir}`;
+                        
+                        if (!recordsMap[key]) {
+                            recordsMap[key] = {
+                                id: Date.now() + index,
+                                tglTest, nama, tglLahir, usiaDetail, tinggi, berat, bmi, bmiStatus,
+                                tests: []
+                            };
+                        }
+
+                        if (paramName) {
+                            recordsMap[key].tests.push({
+                                id: paramId,
+                                name: paramName,
+                                unit: paramUnit,
+                                type: paramDef.type || (isNaN(parseFloat(paramVal)) ? 'text' : 'number'),
+                                normalText: paramNormal,
+                                value: paramVal,
+                                status: paramStatus
+                            });
+                        }
+                    });
+
+                    const importedRecords = Object.values(recordsMap);
+                    if (importedRecords.length > 0) {
+                        savedRecords = importedRecords;
+                        localStorage.setItem('csrRecords', JSON.stringify(savedRecords));
+                        renderSavedRecords();
+                        renderDynamicChart();
+                        alert(`Berhasil mengunggah dan memulihkan ${importedRecords.length} data rekam medis!`);
+                    } else {
+                        alert("Format data di dalam file Excel tidak dikenali.");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Gagal membaca file Excel. Pastikan file sesuai format hasil download.");
+                } finally {
+                    event.target.value = '';
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        window.onload = init;
+    </script>
 </body>
 </html>
