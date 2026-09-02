@@ -8,12 +8,10 @@ Setelah selesai anda wajib log-out untuk keamanan informasi data Anda !
 Data AMAN 100 % HANYA tersimpan diperangkat anda saja !
 
 Cara menggunakan sangat mudah, 
-Anda cukup isi Personal Data Anda 1 X saja (Usia akan menghitung otomatis).
+Anda cukup isi Personal Data Anda 1 X saja.
 Selanjutnya hanya cukup isi data hasil laboratoriumnya sesuai parameternya.
 Jangan lupa setelah selesai isi data, tekan Tombol [SIMPAN REKAM MEDIS]
 Klik Tombol DOWNLOAD untuk back-Up data Anda agar tersimpan & sebagi BACK-UP.
-Jika data tidak terlihat dilayar, anda dapat Upload ulang data Back-Upnya. 
-Anda dapat melihat secara grafik per-jenis parameternya 
 
 Aplikasi Rekam Medis ini
 Telah digunakan diberbagi rumah sakit, apotek dan personal.
