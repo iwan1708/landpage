@@ -1,41 +1,19 @@
 Aplikasi Rekam Medis ini, 
 Kami buat khusus Free untuk Anda.
 
-Sebelum akses ke aplikasi, Anda wajib membuat/generate PIN - 4 Angka.
+Sebelum akses ke aplikasi, Anda wajib Generate PIN - 4 Angka.
+Klik Gambar Gembok  ketik pin17, lalu Generat PIN anda.
 Catat atau SCREENSHOT / Simpan PIN anda JANGAN LUPA !!! 
 Setelah selesai anda wajib log-out untuk keamanan informasi data Anda !
-
 Data AMAN 100 % HANYA tersimpan diperangkat anda saja !
-Check & Test !
-Silakan coba isi data di perangkat yang berbeda,
-maka data yang tersimpan bersesuaian di perangkat masing-masing, 
-dan tidak dapat dilihat diperangkat yang lain atau berbeda.
 
 Cara menggunakan sangat mudah, 
 Anda cukup isi Personal Data Anda 1 X saja (Usia akan menghitung otomatis).
 Selanjutnya hanya cukup isi data hasil laboratoriumnya sesuai parameternya.
-Di setiap parameter-nya anda dapat melihat data refrensi nilai standarnya, 
-dan dari data isian tadi, anda akan mendapat informasi nilai hasilnya.  
-
-
-PENTING !!!
 Jangan lupa setelah selesai isi data, tekan Tombol [SIMPAN REKAM MEDIS]
-untuk memastikan bahwa data yang sudah di-isi TERSIMPAN di-perangkat anda !
 Klik Tombol DOWNLOAD untuk back-Up data Anda agar tersimpan & sebagi BACK-UP.
 Jika data tidak terlihat dilayar, anda dapat Upload ulang data Back-Upnya. 
-
-
-Parameter paling bawah, no.16 dapat diisi dengan catatan sesuai kebutuhan anda.
-Jika ada kesalahan dan dapat diisi kembali dengan benar.
-  
-Anda dapat melihat secara grafik per-jenis parameternya jika 
-telah mengisi lebih dari 1 X dari tanggal awal hingga data terakhir.
-sesuai dengan parameter yang anda pilih.
-
-Data grafik akan memberikan informasi perkembangan/progres data medis anda,
-dan terdisplay urut secara otomatis/kronologis.
-
-Seluruh data rekam medis anda, kami siapkan menu download ke format exel.
+Anda dapat melihat secara grafik per-jenis parameternya 
 
 Aplikasi Rekam Medis ini
 Telah digunakan diberbagi rumah sakit, apotek dan personal.
