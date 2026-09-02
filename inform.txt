@@ -1,7 +1,7 @@
 Aplikasi Rekam Medis ini, 
 Kami buat khusus Free untuk Anda.
 
-Sebelum akses ke aplikasi, Anda wajib Generate PIN - 4 Angka.
+Sebelum akses ke aplikasi,Anda wajib Generate PIN - 4 Angka.
 Klik Gambar Gembok  ketik pin17, lalu Generat PIN anda.
 Catat atau SCREENSHOT / Simpan PIN anda JANGAN LUPA !!! 
 Setelah selesai anda wajib log-out untuk keamanan informasi data Anda !
@@ -12,6 +12,7 @@ Anda cukup isi Personal Data Anda 1 X saja.
 Selanjutnya hanya cukup isi data hasil laboratoriumnya sesuai parameternya.
 Jangan lupa setelah selesai isi data, tekan Tombol [SIMPAN REKAM MEDIS]
 Klik Tombol DOWNLOAD untuk back-Up data Anda agar tersimpan & sebagi BACK-UP.
+Klik UPLOAD jika data tidak tampil dilayar/screen anda.
 
 Aplikasi Rekam Medis ini
 Telah digunakan diberbagi rumah sakit, apotek dan personal.
